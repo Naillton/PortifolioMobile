@@ -3,23 +3,35 @@ package com.nailton.portifoliomobile
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
@@ -27,6 +39,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -68,35 +81,41 @@ fun MainScreen() {
     val colorList = listOf(Color(0xFF421fdf), Color(0xFF0c22de))
     val state = rememberScrollState()
     LaunchedEffect(Unit) { state.animateScrollTo(100)}
-    Box(
-        Modifier
-            .fillMaxWidth()
-            .background(brush = Brush.linearGradient(colorList))
-            .paint(
-                painterResource(id = R.drawable.desenho),
-                contentScale = ContentScale.FillBounds
-            )
-            .verticalScroll(state)
+    val constraint = myConstraintSet()
+
+    ConstraintLayout(
+        constraint
     ) {
-        Content(modifier = Modifier)
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .background(brush = Brush.linearGradient(colorList))
+                .paint(
+                    painterResource(id = R.drawable.desenho),
+                    contentScale = ContentScale.FillBounds
+                )
+                .verticalScroll(state)
+                .layoutId("scrollId")
+        ) {
+            Content(constraint = constraint, modifier = Modifier)
+        }
     }
 }
 
 @Composable
-private fun Content(modifier: Modifier) {
-    val constraint = myConstraintSet()
+private fun Content(constraint: ConstraintSet, modifier: Modifier) {
     ConstraintLayout(
         constraint,
         modifier
     ) {
-        Header(modifier = Modifier)
-        ContentBody(modifier = Modifier)
+        Header(constraint, modifier)
+        ContentBody(constraint, modifier)
+        ContactBottom(constraint, modifier)
     }
 }
 
 @Composable
-private fun Header(modifier: Modifier) {
-    val constraint = myConstraintSet()
+private fun Header(constraint: ConstraintSet, modifier: Modifier) {
     ConstraintLayout(
         constraint,
         modifier = Modifier
@@ -120,8 +139,7 @@ private fun Header(modifier: Modifier) {
 
 @OptIn(ExperimentalTextApi::class)
 @Composable
-private fun ContentBody(modifier: Modifier) {
-    val constraint = myConstraintSet()
+private fun ContentBody(constraint: ConstraintSet, modifier: Modifier) {
     ConstraintLayout(
         constraint,
         modifier
@@ -155,7 +173,8 @@ private fun ContentBody(modifier: Modifier) {
                     }
                 }
             },
-            modifier.padding(12.dp)
+            modifier
+                .padding(12.dp)
                 .layoutId("contentBodyText")
         )
     }
@@ -179,6 +198,96 @@ private fun TitleText(text: String, modifier: Modifier) {
     )
 }
 
+@Composable
+private fun ContactBottom(constraint: ConstraintSet, modifier: Modifier) {
+    ConstraintLayout(
+        constraint,
+        modifier
+            .fillMaxWidth()
+            .height(80.dp)
+            .border(
+                border = BorderStroke(2.dp, Color.Black),
+                shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp)
+            )
+            .layoutId("contentContact")
+    ) {
+        Row(
+            Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            ImageButton(
+                id = R.drawable.baseline_computer_24,
+                desc = "githubButton",
+                btnName = "GitHub",
+                constraint
+            )
+
+            Divider(
+                color = Color.Black,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(2.dp)
+            )
+
+            ImageButton(
+                id = R.drawable.baseline_person_24,
+                desc = "linkedinButton",
+                btnName = "Linkedin",
+                constraint
+            )
+
+            Divider(
+                color = Color.Black,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(2.dp)
+            )
+
+            ImageButton(
+                id = R.drawable.baseline_sms_24,
+                desc = "emailbButton",
+                btnName = "Email",
+                constraint
+            )
+        }
+    }
+}
+
+@Composable
+private fun ImageButton(id: Int, desc: String, btnName: String, constraint: ConstraintSet) {
+    ConstraintLayout(
+        constraint,
+        Modifier.layoutId("contentButonContact")
+    ) {
+        Button(
+            onClick = { /*TODO*/ },
+            Modifier
+                .padding(horizontal = 14.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                contentColor = Color.Transparent
+                )
+        ) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Image(
+                    painter = painterResource(id = id),
+                    contentDescription = desc,
+                    Modifier.size(40.dp, 40.dp)
+                )
+                Text(
+                    text = btnName,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Cyan
+                )
+            }
+        }
+    }
+}
+
 private fun myConstraintSet(): ConstraintSet {
     return ConstraintSet {
         val imagePerfil = createRefFor("imagePerfil")
@@ -187,6 +296,8 @@ private fun myConstraintSet(): ConstraintSet {
         val header = createRefFor("header")
         val contentBodyTitleText = createRefFor("contentBodyTitleText")
         val contentBodyText = createRefFor("contentBodyText")
+        val contentContact = createRefFor("contentContact")
+        val contentButonContact = createRefFor("contentButonContact")
 
         constrain(imagePerfil) {
             top.linkTo(parent.top, 20.dp)
@@ -214,6 +325,15 @@ private fun myConstraintSet(): ConstraintSet {
         constrain(contentBodyText) {
             top.linkTo(contentBodyTitleText.bottom, 20.dp)
             bottom.linkTo(parent.bottom, 20.dp)
+        }
+
+        constrain(contentContact) {
+            top.linkTo(contentBody.bottom, 70.dp)
+            bottom.linkTo(parent.bottom)
+        }
+
+        constrain(contentButonContact) {
+            top.linkTo(parent.top, 40.dp)
         }
     }
 }
