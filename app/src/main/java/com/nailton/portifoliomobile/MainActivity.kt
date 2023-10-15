@@ -1,5 +1,7 @@
 package com.nailton.portifoliomobile
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -40,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -200,6 +203,33 @@ private fun TitleText(text: String, modifier: Modifier) {
 
 @Composable
 private fun ContactBottom(constraint: ConstraintSet, modifier: Modifier) {
+    val context = LocalContext.current
+    val sendEmail = {
+        val share = Intent.createChooser(Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_EMAIL, arrayOf("nailton_junior@protonmail"))
+            putExtra(Intent.EXTRA_SUBJECT, "Ola vim pelo seu portifolio")
+            type = "text/plain"
+        }, null)
+        context.startActivity(share)
+    }
+
+    val clickGit = {
+        context.startActivity(
+            Intent(Intent.ACTION_VIEW).also {
+                it.data = Uri.parse("https://github.com/Naillton")
+            }
+        )
+    }
+
+    val clickLinkedin = {
+        context.startActivity(
+            Intent(Intent.ACTION_VIEW).also {
+                it.data = Uri.parse("https://www.linkedin.com/in/nailtonjr/")
+            }
+        )
+    }
+
     ConstraintLayout(
         constraint,
         modifier
@@ -219,6 +249,7 @@ private fun ContactBottom(constraint: ConstraintSet, modifier: Modifier) {
                 id = R.drawable.baseline_computer_24,
                 desc = "githubButton",
                 btnName = "GitHub",
+                clickGit,
                 constraint
             )
 
@@ -233,6 +264,7 @@ private fun ContactBottom(constraint: ConstraintSet, modifier: Modifier) {
                 id = R.drawable.baseline_person_24,
                 desc = "linkedinButton",
                 btnName = "Linkedin",
+                clickLinkedin,
                 constraint
             )
 
@@ -247,6 +279,7 @@ private fun ContactBottom(constraint: ConstraintSet, modifier: Modifier) {
                 id = R.drawable.baseline_sms_24,
                 desc = "emailbButton",
                 btnName = "Email",
+                sendEmail,
                 constraint
             )
         }
@@ -254,13 +287,18 @@ private fun ContactBottom(constraint: ConstraintSet, modifier: Modifier) {
 }
 
 @Composable
-private fun ImageButton(id: Int, desc: String, btnName: String, constraint: ConstraintSet) {
+private fun ImageButton(
+    id: Int,
+    desc: String,
+    btnName: String,
+    onClick: () -> Unit,
+    constraint: ConstraintSet) {
     ConstraintLayout(
         constraint,
         Modifier.layoutId("contentButonContact")
     ) {
         Button(
-            onClick = { /*TODO*/ },
+            onClick = { onClick() },
             Modifier
                 .padding(horizontal = 14.dp),
             colors = ButtonDefaults.buttonColors(
@@ -324,21 +362,20 @@ private fun myConstraintSet(): ConstraintSet {
 
         constrain(contentBodyText) {
             top.linkTo(contentBodyTitleText.bottom, 20.dp)
-            bottom.linkTo(parent.bottom, 20.dp)
         }
 
         constrain(contentContact) {
-            top.linkTo(contentBody.bottom, 70.dp)
+            top.linkTo(contentBody.bottom, 20.dp)
             bottom.linkTo(parent.bottom)
         }
 
         constrain(contentButonContact) {
-            top.linkTo(parent.top, 40.dp)
+            top.linkTo(parent.top)
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun GreetingPreview() {
     PortifolioMobileTheme {
