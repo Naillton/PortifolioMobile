@@ -102,7 +102,10 @@ fun MainScreen() {
                 ),
         ) {
             Column(
-                Modifier.verticalScroll(state)
+                Modifier
+                    .fillMaxWidth()
+                    .height(650.dp)
+                    .verticalScroll(state)
                     .layoutId("scrollId"),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
