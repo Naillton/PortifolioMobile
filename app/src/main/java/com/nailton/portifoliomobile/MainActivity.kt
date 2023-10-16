@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,9 +35,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
+import androidx.compose.ui.focus.FocusRequester.Companion.createRefs
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -89,32 +92,32 @@ fun MainScreen() {
     ConstraintLayout(
         constraint
     ) {
-        Box(
+        Column(
             Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .background(brush = Brush.linearGradient(colorList))
                 .paint(
                     painterResource(id = R.drawable.desenho),
                     contentScale = ContentScale.FillBounds
-                )
-                .verticalScroll(state)
-                .layoutId("scrollId")
+                ),
         ) {
-            Content(constraint = constraint, modifier = Modifier)
+            Column(
+                Modifier.verticalScroll(state)
+                    .layoutId("scrollId"),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Content(constraint = constraint, modifier = Modifier)
+            }
+            ContactBottom(constraint, modifier = Modifier)
         }
     }
 }
 
 @Composable
 private fun Content(constraint: ConstraintSet, modifier: Modifier) {
-    ConstraintLayout(
-        constraint,
-        modifier
-    ) {
-        Header(constraint, modifier)
-        ContentBody(constraint, modifier)
-        ContactBottom(constraint, modifier)
-    }
+    Header(constraint, modifier)
+    ContentBody(constraint, modifier)
 }
 
 @Composable
@@ -232,56 +235,58 @@ private fun ContactBottom(constraint: ConstraintSet, modifier: Modifier) {
 
     ConstraintLayout(
         constraint,
-        modifier
-            .fillMaxWidth()
-            .height(80.dp)
-            .border(
-                border = BorderStroke(2.dp, Color.Black),
-                shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp)
-            )
-            .layoutId("contentContact")
     ) {
-        Row(
-            Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.SpaceBetween
+        Box(
+            Modifier.layoutId("contentContact")
         ) {
-            ImageButton(
-                id = R.drawable.baseline_computer_24,
-                desc = "githubButton",
-                btnName = "GitHub",
-                clickGit,
-                constraint
-            )
+            Row(
+                Modifier.fillMaxWidth()
+                    .height(80.dp)
+                    .border(
+                        border = BorderStroke(2.dp, Color.Black),
+                        shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp)
+                    ),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ImageButton(
+                    id = R.drawable.baseline_computer_24,
+                    desc = "githubButton",
+                    btnName = "GitHub",
+                    clickGit,
+                    constraint
+                )
 
-            Divider(
-                color = Color.Black,
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .width(2.dp)
-            )
+                Divider(
+                    color = Color.Black,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(2.dp)
+                )
 
-            ImageButton(
-                id = R.drawable.baseline_person_24,
-                desc = "linkedinButton",
-                btnName = "Linkedin",
-                clickLinkedin,
-                constraint
-            )
+                ImageButton(
+                    id = R.drawable.baseline_person_24,
+                    desc = "linkedinButton",
+                    btnName = "Linkedin",
+                    clickLinkedin,
+                    constraint
+                )
 
-            Divider(
-                color = Color.Black,
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .width(2.dp)
-            )
+                Divider(
+                    color = Color.Black,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(2.dp)
+                )
 
-            ImageButton(
-                id = R.drawable.baseline_sms_24,
-                desc = "emailbButton",
-                btnName = "Email",
-                sendEmail,
-                constraint
-            )
+                ImageButton(
+                    id = R.drawable.baseline_sms_24,
+                    desc = "emailbButton",
+                    btnName = "Email",
+                    sendEmail,
+                    constraint
+                )
+            }
         }
     }
 }
@@ -294,17 +299,17 @@ private fun ImageButton(
     onClick: () -> Unit,
     constraint: ConstraintSet) {
     ConstraintLayout(
-        constraint,
-        Modifier.layoutId("contentButonContact")
+        constraint
     ) {
         Button(
             onClick = { onClick() },
             Modifier
-                .padding(horizontal = 14.dp),
+                .padding(horizontal = 14.dp)
+                .layoutId("contentButonContact"),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Transparent,
                 contentColor = Color.Transparent
-                )
+                ),
         ) {
             Column(
                 verticalArrangement = Arrangement.Center,
@@ -313,11 +318,11 @@ private fun ImageButton(
                 Image(
                     painter = painterResource(id = id),
                     contentDescription = desc,
-                    Modifier.size(40.dp, 40.dp)
+                    Modifier.size(30.dp, 30.dp)
                 )
                 Text(
                     text = btnName,
-                    fontSize = 16.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color.Cyan
                 )
@@ -336,6 +341,17 @@ private fun myConstraintSet(): ConstraintSet {
         val contentBodyText = createRefFor("contentBodyText")
         val contentContact = createRefFor("contentContact")
         val contentButonContact = createRefFor("contentButonContact")
+        val scrollId = createRefFor("scrollId")
+
+        constrain(scrollId) {
+            top.linkTo(parent.top)
+            centerHorizontallyTo(parent)
+        }
+
+        constrain(header) {
+            top.linkTo(scrollId.top)
+            centerHorizontallyTo(scrollId)
+        }
 
         constrain(imagePerfil) {
             top.linkTo(parent.top, 20.dp)
@@ -344,11 +360,7 @@ private fun myConstraintSet(): ConstraintSet {
 
         constrain(titleText) {
             top.linkTo(imagePerfil.bottom, 20.dp)
-            centerHorizontallyTo(parent)
-        }
-
-        constrain(header) {
-            top.linkTo(parent.top)
+            centerHorizontallyTo(scrollId)
         }
 
         constrain(contentBody) {
@@ -357,7 +369,7 @@ private fun myConstraintSet(): ConstraintSet {
 
         constrain(contentBodyTitleText) {
             top.linkTo(parent.top, 20.dp)
-            centerHorizontallyTo(parent)
+            centerHorizontallyTo(scrollId)
         }
 
         constrain(contentBodyText) {
@@ -365,7 +377,7 @@ private fun myConstraintSet(): ConstraintSet {
         }
 
         constrain(contentContact) {
-            top.linkTo(contentBody.bottom, 20.dp)
+            top.linkTo(scrollId.bottom, 60.dp)
             bottom.linkTo(parent.bottom)
         }
 
