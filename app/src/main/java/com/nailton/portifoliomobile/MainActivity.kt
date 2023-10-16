@@ -1,5 +1,6 @@
 package com.nailton.portifoliomobile
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -88,6 +89,11 @@ fun MainScreen() {
     val state = rememberScrollState()
     LaunchedEffect(Unit) { state.animateScrollTo(100)}
     val constraint = myConstraintSet()
+    val context = LocalContext.current
+    val displayMetrics = context.resources.displayMetrics
+
+    //Height Of Screen
+    val height = displayMetrics.heightPixels / 2.3
 
     ConstraintLayout(
         constraint
@@ -104,7 +110,7 @@ fun MainScreen() {
             Column(
                 Modifier
                     .fillMaxWidth()
-                    .height(650.dp)
+                    .height(height.dp)
                     .verticalScroll(state)
                     .layoutId("scrollId"),
                 verticalArrangement = Arrangement.Center,
@@ -112,7 +118,7 @@ fun MainScreen() {
             ) {
                 Content(constraint = constraint, modifier = Modifier)
             }
-            ContactBottom(constraint, modifier = Modifier)
+            ContactBottom(constraint, context)
         }
     }
 }
@@ -208,8 +214,7 @@ private fun TitleText(text: String, modifier: Modifier) {
 }
 
 @Composable
-private fun ContactBottom(constraint: ConstraintSet, modifier: Modifier) {
-    val context = LocalContext.current
+private fun ContactBottom(constraint: ConstraintSet, context: Context) {
     val sendEmail = {
         val share = Intent.createChooser(Intent().apply {
             action = Intent.ACTION_SEND
@@ -325,13 +330,29 @@ private fun ImageButton(
                 )
                 Text(
                     text = btnName,
-                    fontSize = 14.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color.Cyan
                 )
             }
         }
     }
+}
+
+@Composable
+private fun ScreenSizeHelper() {
+
+    val context = LocalContext.current
+
+    val displayMetrics = context.resources.displayMetrics
+
+    //Width And Height Of Screen
+    val width = displayMetrics.widthPixels
+    val height = displayMetrics.heightPixels
+
+    //Device Density
+    val density = displayMetrics.density
+
 }
 
 private fun myConstraintSet(): ConstraintSet {
@@ -380,7 +401,7 @@ private fun myConstraintSet(): ConstraintSet {
         }
 
         constrain(contentContact) {
-            top.linkTo(scrollId.bottom, 60.dp)
+            top.linkTo(scrollId.bottom, 14.dp)
             bottom.linkTo(parent.bottom)
         }
 
