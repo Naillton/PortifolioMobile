@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -97,7 +98,7 @@ fun MainScreen() {
     val displayMetrics = context.resources.displayMetrics
 
     //Height Of Screen
-    val height = displayMetrics.heightPixels / 2.3
+    val height = LocalConfiguration.current.screenHeightDp.dp - 80.dp
 
     ConstraintLayout(
         constraint
@@ -114,7 +115,7 @@ fun MainScreen() {
             Column(
                 Modifier
                     .fillMaxWidth()
-                    .height(height.dp)
+                    .height(height)
                     .verticalScroll(state)
                     .layoutId("scrollId"),
                 verticalArrangement = Arrangement.Center,
@@ -534,7 +535,7 @@ private fun myConstraintSet(): ConstraintSet {
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     PortifolioMobileTheme {
